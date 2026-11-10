@@ -1,6 +1,17 @@
-<h1>Restricciones blandas</h1>
-<ul>
-  {% for r in restricciones %}
-    <li>{{ r.nombre }} — peso {{ r.peso }}</li>
-  {% endfor %}
-</ul>
+{% extends 'base.html' %}
+
+{% block titulo %}Restricciones blandas{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta">
+  <h5 class="mb-3"><i class="bi bi-gear-fill"></i> Restricciones blandas</h5>
+  <ul class="list-group list-group-flush">
+    {% for r in restricciones %}
+      <li class="list-group-item d-flex justify-content-between">
+        {{ r.nombre }}
+        <span class="badge text-bg-primary">peso {{ r.peso }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
