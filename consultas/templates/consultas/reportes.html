@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Reportes{% endblock %}
+
+{% block contenido %}
+
+{% if ultima_ejecucion %}
+<div class="alert {% if ultima_ejecucion.estado == 'completa' %}alert-success{% else %}alert-warning{% endif %} d-flex gap-3 align-items-center">
+  <i class="bi bi-info-circle fs-4"></i>
+  <div>
+    Última generación: <strong>{{ ultima_ejecucion.get_estado_display }}</strong>
+    — {{ ultima_ejecucion.clases_asignadas }} de {{ ultima_ejecucion.clases_totales }} clases asignadas
+    ({{ ultima_ejecucion.fecha|date:"d/m/Y h:i A" }}).
+  </div>
+</div>
+{% else %}
+<div class="alert alert-secondary">Aún no se ha generado ningún horario.</div>
+{% endif %}
+
+<!-- Conflictos y materias no programadas -->
+<div class="tarjeta mb-3">
+  <div class="tarjeta-titulo"><i class="bi bi-exclamation-triangle"></i> Materias no programadas y conflictos</div>
+  <div class="table-responsive">
+    <table class="table tabla-siguet mb-0">
+      <thead>
+        <tr><th>Asignatura</th><th>Grupo</th><th>Docente</th><th>Restricción que lo impidió</th></tr>
+      </thead>
+      <tbody>
+        {% for c in conflictos %}
+        <tr>
+          <td>{{ c.clase.asignatura.nombre }}</td>
+          <td>{{ c.clase.grupo.codigo }}</td>
+          <td>{{ c.clase.docente.nombre }}</td>
+          <td><span class="badge text-bg-warning">{{ c.restriccion }}</span>{% if c.descripcion %}<div class="small text-secondary mt-1">{{ c.descripcion }}</div>{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="text-center text-secondary py-4">No hay conflictos registrados.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Ocupación de aulas -->
+<div class="tarjeta">
+  <div class="tarjeta-titulo"><i class="bi bi-bar-chart"></i> Porcentaje de ocupación de aulas</div>
+  <div class="table-responsive">
+    <table class="table tabla-siguet align-middle mb-0">
+      <thead>
+        <tr><th>Aula</th><th>Tipo</th><th>Capacidad</th><th>Clases asignadas</th><th style="width: 220px;">Ocupación</th></tr>
+      </thead>
+      <tbody>
+        {% for aula in ocupacion %}
+        <tr>
+          <td class="fw-semibold">{{ aula.codigo }}</td>
+          <td>{{ aula.get_tipo_display }}</td>
+          <td>{{ aula.capacidad }}</td>
+          <td>{{ aula.usos }}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1" style="height: 6px; background-color: var(--borde);">
+                <div class="progress-bar" style="width: {{ aula.ocupacion }}%;"></div>
+              </div>
+              <span class="small">{{ aula.ocupacion }} %</span>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-secondary py-4">No hay aulas registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="small text-secondary mt-2">Ocupación = clases asignadas al aula ÷ franjas horarias registradas × 100.</div>
+</div>
+{% endblock %}

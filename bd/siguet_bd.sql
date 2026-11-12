@@ -127,6 +127,16 @@ CREATE TABLE docente (
 );
 
 
+-- ---------- Vínculo usuario - docente ----------
+-- Permite que un usuario con perfil consultor (docente) vea "Mis horarios".
+-- Se agrega aquí porque la tabla usuario se crea antes que docente.
+-- UNIQUE: un docente tiene como máximo un usuario.
+-- ON DELETE SET NULL: si se borra el docente, el usuario queda sin vínculo.
+ALTER TABLE usuario
+    ADD COLUMN docente_id INTEGER UNIQUE
+        REFERENCES docente(id) ON DELETE SET NULL;
+
+
 -- ---------- Grupos académicos ----------
 CREATE TABLE grupo (
     id                   SERIAL      PRIMARY KEY,

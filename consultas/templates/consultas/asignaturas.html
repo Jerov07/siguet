@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Asignaturas{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta">
+  <div class="tarjeta-titulo"><i class="bi bi-book"></i> Asignaturas</div>
+  <div class="table-responsive">
+    <table class="table tabla-siguet mb-0">
+      <thead>
+        <tr><th>Código</th><th>Nombre</th><th>Horas semanales</th><th>Tipo de aula</th><th>Grupos</th></tr>
+      </thead>
+      <tbody>
+        {% for a in asignaturas %}
+        <tr>
+          <td>{{ a.codigo }}</td>
+          <td>{{ a.nombre }}</td>
+          <td>{{ a.intensidad_horaria }}</td>
+          <td>{{ a.get_tipo_aula_requerida_display }}</td>
+          <td>{{ a.grupos }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-secondary py-4">No hay asignaturas registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

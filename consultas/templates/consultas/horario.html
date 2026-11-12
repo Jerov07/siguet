@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Horarios{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta">
+  <!-- Filtros: qué vista y qué grupo/docente/aula -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+    <form method="get" class="d-flex gap-2 align-items-center">
+      <input type="hidden" name="vista" value="{{ vista }}">
+      <label class="fw-semibold text-capitalize" for="selector">{{ vista }}:</label>
+      <select id="selector" name="id" class="form-select" style="min-width: 220px;" onchange="this.form.submit()">
+        {% for valor, texto in opciones %}
+          <option value="{{ valor }}" {% if seleccionado == valor|stringformat:"s" %}selected{% endif %}>{{ texto }}</option>
+        {% empty %}
+          <option>No hay registros</option>
+        {% endfor %}
+      </select>
+    </form>
+
+    <div class="vistas small">
+      <a href="?vista=grupo" class="{% if vista == 'grupo' %}activa{% endif %}">Vista por Grupo</a> |
+      <a href="?vista=docente" class="{% if vista == 'docente' %}activa{% endif %}">Vista por Docente</a> |
+      <a href="?vista=aula" class="{% if vista == 'aula' %}activa{% endif %}">Vista por Aula</a>
+    </div>
+  </div>
+
+  {% include 'consultas/_cuadricula.html' %}
+</div>
+{% endblock %}

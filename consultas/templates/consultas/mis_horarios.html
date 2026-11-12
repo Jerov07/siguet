@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Mis Horarios{% endblock %}
+
+{% block contenido %}
+{% if docente %}
+<div class="row g-3 mb-3">
+  <div class="col-md-6 col-xl-4">
+    <div class="tarjeta tarjeta-numero">
+      <div class="icono-cuadro"><i class="bi bi-person-badge"></i></div>
+      <div><div class="fw-semibold">{{ docente.nombre }}</div><div class="etiqueta">Docente</div></div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-4">
+    <div class="tarjeta tarjeta-numero">
+      <div class="icono-cuadro"><i class="bi bi-calendar-week"></i></div>
+      <div><div class="numero">{{ total_clases }}</div><div class="etiqueta">Clases a la semana</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="tarjeta">
+  <div class="tarjeta-titulo"><i class="bi bi-calendar-week"></i> Mi horario semanal</div>
+  {% include 'consultas/_cuadricula.html' %}
+</div>
+{% else %}
+<div class="tarjeta text-center py-5">
+  <i class="bi bi-link-45deg fs-1 text-secondary"></i>
+  <h5 class="mt-2">Tu usuario no está vinculado a un docente</h5>
+  <p class="text-secondary mb-0">Pídele al administrador que vincule tu usuario con tu registro de docente para ver aquí tu horario.<br>
+  Mientras tanto, puedes buscarlo en <a href="{% url 'horario' %}?vista=docente">Horarios → Vista por Docente</a>.</p>
+</div>
+{% endif %}
+{% endblock %}

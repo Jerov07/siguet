@@ -30,7 +30,14 @@
       <a class="nav-link {% if '/generacion/' in request.path %}activo{% endif %}" href="/generacion/"><i class="bi bi-calendar-plus"></i> Generar Horario</a>
       {% endif %}
 
-      <a class="nav-link {% if '/consultas/horario/' in request.path %}activo{% endif %}" href="/consultas/horario/"><i class="bi bi-search"></i> Consultas</a>
+      {% if request.session.perfil != 'administrador' %}
+      <a class="nav-link {% if '/consultas/mis-horarios/' in request.path %}activo{% endif %}" href="/consultas/mis-horarios/"><i class="bi bi-person-badge"></i> Mis Horarios</a>
+      {% endif %}
+      <a class="nav-link {% if '/consultas/horario/' in request.path %}activo{% endif %}" href="/consultas/horario/"><i class="bi bi-calendar-week"></i> {% if request.session.perfil == 'administrador' %}Consultar Horarios{% else %}Horarios{% endif %}</a>
+      {% if request.session.perfil != 'administrador' %}
+      <a class="nav-link {% if '/consultas/asignaturas/' in request.path %}activo{% endif %}" href="/consultas/asignaturas/"><i class="bi bi-book"></i> Asignaturas</a>
+      <a class="nav-link {% if '/consultas/aulas/' in request.path %}activo{% endif %}" href="/consultas/aulas/"><i class="bi bi-bank"></i> Aulas</a>
+      {% endif %}
       <a class="nav-link {% if '/consultas/reportes/' in request.path %}activo{% endif %}" href="/consultas/reportes/"><i class="bi bi-graph-up"></i> Reportes</a>
     </nav>
 
@@ -47,7 +54,7 @@
   <div class="contenido">
     <header class="barra-superior">
       <div class="avatar">{{ request.session.nombre|slice:":1" }}</div>
-      <span class="usuario-nombre">{{ request.session.perfil|capfirst }} - {{ request.session.nombre }}</span>
+      <span class="usuario-nombre">{% if request.session.perfil == 'administrador' %}Administrador{% else %}Docente{% endif %} - {{ request.session.nombre }}</span>
       <a href="{% url 'logout' %}" class="btn-icono" title="Cerrar sesión"><i class="bi bi-box-arrow-right"></i></a>
     </header>
 

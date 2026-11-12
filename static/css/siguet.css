@@ -328,3 +328,49 @@ body {
   .menu-lateral { width: 100%; }
   .menu-abajo { margin-top: 8px; }
 }
+
+/* ---------- Horario semanal ---------- */
+.vistas a {
+  color: var(--texto-suave);
+  text-decoration: none;
+}
+
+.vistas a.activa {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.horario-semanal th {
+  background-color: #f7f9fc;
+  font-weight: 600;
+}
+
+.horario-semanal .hora {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.horario-semanal td {
+  height: 88px;
+  min-width: 140px;
+  padding: 6px;
+  vertical-align: middle;
+}
+
+.clase-tarjeta {
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+}
+
+.clase-tarjeta + .clase-tarjeta {
+  margin-top: 4px;
+}
+
+.clase-nombre {
+  font-weight: 700;
+  text-transform: uppercase;
+}

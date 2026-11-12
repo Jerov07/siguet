@@ -2,7 +2,7 @@ from django.db import models
 
 PERFILES = [
     ('administrador', 'Administrador'),
-    ('consultor', 'Consultor'),
+    ('consultor', 'Docente'),   # en la base se guarda 'consultor'; en pantalla se muestra 'Docente'
 ]
 
 TIPOS_AULA = [
@@ -34,6 +34,8 @@ class Usuario(models.Model):
     perfil = models.CharField(max_length=20, choices=PERFILES)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    # Docente al que corresponde este usuario (para "Mis horarios"). Puede estar vacío.
+    docente = models.OneToOneField('Docente', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False

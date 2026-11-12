@@ -21,6 +21,7 @@ def iniciar_sesion(request):
             # "Ponerle la manilla": guardar en la sesión quién es y su perfil
             request.session['usuario_id'] = usuario.id
             request.session['perfil'] = usuario.perfil
+            request.session['perfil_nombre'] = usuario.get_perfil_display()   # 'Administrador' o 'Docente'
             request.session['nombre'] = usuario.nombre_completo
             return redirect('dashboard')
 

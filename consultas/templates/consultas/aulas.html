@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Aulas{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta">
+  <div class="tarjeta-titulo"><i class="bi bi-bank"></i> Aulas y Espacios</div>
+  <div class="table-responsive">
+    <table class="table tabla-siguet align-middle mb-0">
+      <thead>
+        <tr><th>Código</th><th>Ubicación</th><th>Tipo</th><th>Capacidad</th><th style="width: 200px;">Ocupación</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for aula in aulas %}
+        <tr>
+          <td class="fw-semibold">{{ aula.codigo }}</td>
+          <td>{{ aula.ubicacion|default:"—" }}</td>
+          <td>{{ aula.get_tipo_display }}</td>
+          <td>{{ aula.capacidad }} estudiantes</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="progress flex-grow-1" style="height: 6px; background-color: var(--borde);">
+                <div class="progress-bar" style="width: {{ aula.ocupacion }}%;"></div>
+              </div>
+              <span class="small">{{ aula.ocupacion }} %</span>
+            </div>
+          </td>
+          <td class="text-end"><a href="{% url 'horario' %}?vista=aula&id={{ aula.id }}" class="btn btn-sm btn-siguet-borde">Ver horario</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">No hay aulas registradas.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
