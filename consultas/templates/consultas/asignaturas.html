@@ -5,28 +5,54 @@
 {% block contenido %}
 {% if docente %}
 <div class="tarjeta">
-  <div class="tarjeta-titulo"><i class="bi bi-list-ul"></i> Mis Asignaturas</div>
-  <div class="table-responsive">
-    <table class="table tabla-siguet mb-0">
-      <thead>
-        <tr><th>Código</th><th>Asignatura</th><th>Grupo</th><th>Horas semanales</th><th>Sesiones</th><th>Tipo de aula</th></tr>
-      </thead>
-      <tbody>
-        {% for c in clases %}
-        <tr>
-          <td>{{ c.asignatura.codigo }}</td>
-          <td>{{ c.asignatura.nombre }}</td>
-          <td>{{ c.grupo.codigo }}</td>
-          <td>{{ c.asignatura.intensidad_horaria }}</td>
-          <td>{{ c.sesiones_semanales }}</td>
-          <td>{{ c.asignatura.get_tipo_aula_requerida_display }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="6" class="text-center text-secondary py-4">Todavía no tienes asignaturas asignadas.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="tarjeta-titulo"><i class="bi bi-list-ul"></i> Materias que darás este semestre</div>
+
+  {% if materias %}
+  <div class="accordion" id="materias">
+    {% for m in materias %}
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button {% if not forloop.first %}collapsed{% endif %}" type="button"
+                data-bs-toggle="collapse" data-bs-target="#materia-{{ m.asignatura.id }}">
+          <span class="fw-semibold me-2">{{ m.asignatura.nombre }}</span>
+          <span class="badge text-bg-light border me-2">{{ m.asignatura.codigo }}</span>
+          <span class="small text-secondary">{{ m.grupos|length }} grupo{{ m.grupos|length|pluralize }} ·
+            {{ m.asignatura.intensidad_horaria }} h semanales · {{ m.asignatura.get_tipo_aula_requerida_display }}</span>
+        </button>
+      </h2>
+      <div id="materia-{{ m.asignatura.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" data-bs-parent="#materias">
+        <div class="accordion-body">
+          {% for g in m.grupos %}
+          <div class="mb-3">
+            <div class="fw-semibold mb-2"><i class="bi bi-people"></i> Grupo {{ g.clase.grupo.codigo }}
+              <span class="small text-secondary fw-normal">({{ g.clase.grupo.programa|default:"" }}, {{ g.clase.grupo.cantidad_estudiantes }} estudiantes)</span>
+            </div>
+            {% if g.sesiones %}
+            <table class="table tabla-siguet table-sm mb-0">
+              <thead><tr><th>Día</th><th>Hora</th><th>Aula</th></tr></thead>
+              <tbody>
+                {% for s in g.sesiones %}
+                <tr>
+                  <td>{{ s.franja.get_dia_semana_display }}</td>
+                  <td>{{ s.franja.hora_inicio|time:"H:i" }} - {{ s.franja.hora_fin|time:"H:i" }}</td>
+                  <td>{{ s.aula.codigo }} <span class="small text-secondary">{{ s.aula.ubicacion|default:"" }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <div class="small text-secondary">Aún sin horario: aparecerá cuando se genere.</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
+  {% else %}
+    <p class="text-secondary mb-0">Todavía no tienes materias asignadas.</p>
+  {% endif %}
 </div>
 {% else %}
   {% include 'consultas/_sin_vinculo.html' %}

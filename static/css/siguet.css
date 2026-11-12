@@ -641,3 +641,15 @@ body {
   .layout-generar { flex-direction: column; }
   .menu-degradado { width: 100%; }
 }
+
+/* ---------- Modo de edición manual del horario ---------- */
+.modo-edicion .clase-tarjeta {
+  cursor: pointer;
+  outline: 2px dashed rgba(255, 255, 255, 0.9);
+  outline-offset: -4px;
+  transition: transform 0.1s;
+}
+
+.modo-edicion .clase-tarjeta:hover {
+  transform: scale(1.04);
+}

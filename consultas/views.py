@@ -158,14 +158,27 @@ def _docente_de(request):
 
 @requiere_perfil('consultor')
 def asignaturas(request):
-    """Materias que dicta el docente, con su grupo y sesiones (solo consulta)."""
+    """Materias que dará el docente este semestre. Cada una se despliega y muestra
+    sus grupos con el día, la hora y el aula de cada sesión."""
     docente = _docente_de(request)
-    clases = []
+    materias = []
     if docente:
         clases = (Clase.objects.filter(docente=docente)
                   .select_related('asignatura', 'grupo')
                   .order_by('asignatura__nombre', 'grupo__codigo'))
-    return render(request, 'consultas/asignaturas.html', {'docente': docente, 'clases': clases})
+        sesiones = {}
+        for a in (Asignacion.objects.filter(docente=docente)
+                  .select_related('franja', 'aula')
+                  .order_by('franja__dia_semana', 'franja__hora_inicio')):
+            sesiones.setdefault(a.clase_id, []).append(a)
+
+        por_materia = {}
+        for c in clases:
+            materia = por_materia.setdefault(c.asignatura_id, {'asignatura': c.asignatura, 'grupos': []})
+            materia['grupos'].append({'clase': c, 'sesiones': sesiones.get(c.id, [])})
+        materias = list(por_materia.values())
+
+    return render(request, 'consultas/asignaturas.html', {'docente': docente, 'materias': materias})
 
 
 @requiere_perfil('consultor')

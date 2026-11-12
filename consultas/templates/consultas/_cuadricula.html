@@ -16,7 +16,7 @@
         {% for celda in fila.celdas %}
         <td>
           {% for a in celda %}
-          <div class="clase-tarjeta" style="background-color: {{ a.color }};">
+          <div class="clase-tarjeta" data-asignacion="{{ a.id }}" style="background-color: {{ a.color }};">
             <div class="clase-nombre">{{ a.clase.asignatura.nombre }}</div>
             <div>{{ a.docente.nombre }}</div>
             <div class="d-flex justify-content-between"><span>{{ a.aula.codigo }}</span><span>{{ a.grupo.codigo }}</span></div>

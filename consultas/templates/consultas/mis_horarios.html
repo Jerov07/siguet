@@ -19,11 +19,140 @@
   </div>
 </div>
 
+<div id="aviso-movida" class="alert alert-success d-none"><i class="bi bi-check-circle"></i> Clase movida correctamente.</div>
+
 <div class="tarjeta">
-  <div class="tarjeta-titulo"><i class="bi bi-calendar-week"></i> Mi horario semanal</div>
+  <div class="tarjeta-titulo justify-content-between">
+    <span><i class="bi bi-calendar-week"></i> Mi horario semanal</span>
+    {% if total_clases %}
+    <button class="btn btn-sm btn-siguet-borde" id="btn-modificar"><i class="bi bi-pencil-square"></i> Modificar horario manualmente</button>
+    {% endif %}
+  </div>
+
+  <div id="instruccion" class="alert alert-info py-2 small d-none">
+    <i class="bi bi-hand-index"></i> Haga clic en una clase para cambiarla de día, hora o aula.
+    Solo se muestran los espacios libres que cumplen todas las reglas.
+  </div>
+
   {% include 'consultas/_cuadricula.html' %}
 </div>
+
+<!-- Ventana para mover una clase -->
+<div class="modal fade" id="ventana-mover" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-arrow-left-right"></i> Mover clase</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="clase-actual" class="mb-3 small"></div>
+        <div id="mensaje-mover" class="alert d-none"></div>
+        <div id="lista-opciones"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% csrf_token %}
 {% else %}
   {% include 'consultas/_sin_vinculo.html' %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if docente and total_clases %}
+<script>
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
+  const ventana = new bootstrap.Modal(document.getElementById('ventana-mover'));
+  let modoEdicion = false;
+  let asignacionActual = null;
+
+  // Si venimos de mover una clase, mostrar el aviso
+  if (location.search.includes('movida=1')) {
+    document.getElementById('aviso-movida').classList.remove('d-none');
+  }
+
+  // ---- Activar o desactivar el modo de edición ----
+  document.getElementById('btn-modificar').addEventListener('click', function () {
+    modoEdicion = !modoEdicion;
+    document.body.classList.toggle('modo-edicion', modoEdicion);
+    document.getElementById('instruccion').classList.toggle('d-none', !modoEdicion);
+    this.innerHTML = modoEdicion
+      ? '<i class="bi bi-x-lg"></i> Terminar de modificar'
+      : '<i class="bi bi-pencil-square"></i> Modificar horario manualmente';
+  });
+
+  // ---- Clic en una clase: pedir al servidor los espacios válidos ----
+  document.querySelectorAll('.clase-tarjeta').forEach(function (tarjeta) {
+    tarjeta.addEventListener('click', function () {
+      if (!modoEdicion) { return; }
+      asignacionActual = tarjeta.dataset.asignacion;
+      cargarOpciones();
+      ventana.show();
+    });
+  });
+
+  async function cargarOpciones() {
+    const lista = document.getElementById('lista-opciones');
+    lista.innerHTML = '<div class="text-center py-3"><span class="spinner-border spinner-border-sm"></span> Buscando espacios libres...</div>';
+    const respuesta = await fetch('/generacion/asignacion/' + asignacionActual + '/opciones/');
+    const datos = await respuesta.json();
+    if (!datos.ok) { mostrarMensaje('danger', datos.mensaje); lista.innerHTML = ''; return; }
+
+    const a = datos.actual;
+    document.getElementById('clase-actual').innerHTML =
+      '<strong>' + a.asignatura + '</strong> (' + a.grupo + ')<br>Ahora: ' + a.dia + ' ' + a.hora + ' en ' + a.aula;
+
+    if (datos.opciones.length === 0) {
+      lista.innerHTML = '<p class="text-secondary mb-0">No hay otros espacios libres que cumplan las reglas para esta clase.</p>';
+      return;
+    }
+
+    // Una fila por día y hora, con un botón por cada aula libre
+    let html = '<table class="table tabla-siguet align-middle mb-0"><thead><tr><th>Día</th><th>Hora</th><th>Aulas libres</th></tr></thead><tbody>';
+    datos.opciones.forEach(function (op) {
+      html += '<tr><td>' + op.dia + '</td><td>' + op.hora + '</td><td class="d-flex flex-wrap gap-1">';
+      op.aulas.forEach(function (aula) {
+        html += '<button class="btn btn-sm btn-siguet-borde opcion" data-franja="' + op.franja_id +
+                '" data-aula="' + aula.id + '">' + aula.codigo + ' (' + aula.capacidad + ')</button>';
+      });
+      html += '</td></tr>';
+    });
+    html += '</tbody></table>';
+    lista.innerHTML = html;
+
+    lista.querySelectorAll('.opcion').forEach(function (boton) {
+      boton.addEventListener('click', function () { mover(boton.dataset.franja, boton.dataset.aula); });
+    });
+  }
+
+  // ---- Guardar el cambio ----
+  async function mover(franjaId, aulaId) {
+    const datos = new FormData();
+    datos.append('franja_id', franjaId);
+    datos.append('aula_id', aulaId);
+    const respuesta = await fetch('/generacion/asignacion/' + asignacionActual + '/mover/', {
+      method: 'POST', headers: { 'X-CSRFToken': csrf }, body: datos
+    });
+    const resultado = await respuesta.json();
+    if (resultado.ok) {
+      location.href = location.pathname + '?movida=1';
+    } else {
+      // Por ejemplo: otro docente tomó ese salón hace un instante. Se recargan las opciones.
+      mostrarMensaje('warning', resultado.mensaje);
+      cargarOpciones();
+    }
+  }
+
+  function mostrarMensaje(tipo, texto) {
+    const caja = document.getElementById('mensaje-mover');
+    caja.className = 'alert alert-' + tipo;
+    caja.textContent = texto;
+  }
+
+  document.getElementById('ventana-mover').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('mensaje-mover').className = 'alert d-none';
+  });
+</script>
 {% endif %}
 {% endblock %}
