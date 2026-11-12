@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'nucleo',
+    'consultas',
+    'cuentas',
+    'generacion',
 ]
 
 MIDDLEWARE = [
@@ -113,7 +116,7 @@ TIME_ZONE = 'America/Bogota'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False  # las columnas TIMESTAMP de la base no guardan zona horaria
 
 
 # Static files (CSS, JavaScript, Images)
@@ -126,3 +129,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Sesión (RNF-09): se cierra tras 30 minutos sin actividad.
+# SESSION_SAVE_EVERY_REQUEST reinicia el contador con cada clic.
+SESSION_COOKIE_AGE = 30 * 60
+SESSION_SAVE_EVERY_REQUEST = True

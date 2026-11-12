@@ -1,36 +1,330 @@
+/* =========================================================
+   SIGUET — estilos propios (sobre Bootstrap 5)
+   Basado en el mockup del Dashboard y de Generar Horario.
+   ========================================================= */
+
+/* ---------- Colores del sistema (variables) ---------- */
+:root {
+  --azul-marino: #1c2e4f;      /* menú lateral */
+  --azul-marino-claro: #2a4170;/* opción activa del menú */
+  --azul: #2c6bd6;             /* botones e íconos */
+  --azul-oscuro: #0f2b5b;      /* botón del login */
+  --verde: #2e9e5b;            /* estado correcto */
+  --naranja: #e08a1e;          /* advertencias */
+  --fondo: #f1f4f8;            /* fondo del contenido */
+  --borde: #e3e8ef;            /* bordes suaves */
+  --texto-suave: #6b778c;
+}
+
 body {
-  background-color: #eef1f5;
+  background-color: var(--fondo);
+  color: #1f2937;
 }
 
-.barra-superior {
-  background-color: #2c3e50;
+/* ---------- Estructura general ---------- */
+.layout {
+  display: flex;
+  min-height: 100vh;
 }
 
+.contenido {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ---------- Menú lateral ---------- */
 .menu-lateral {
-  width: 230px;
-  min-height: calc(100vh - 56px);
-  background: linear-gradient(180deg, #4a8fe0 0%, #1f3f75 100%);
+  width: 240px;
+  flex-shrink: 0;
+  background-color: var(--azul-marino);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 4px 8px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 14px;
+}
+
+.marca:hover {
+  color: #ffffff;
+}
+
+.menu-titulo {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8a9ab8;
+  padding: 0 10px 8px;
 }
 
 .menu-lateral .nav-link {
-  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #c9d3e3;
   border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 4px;
+  padding: 9px 10px;
+  margin-bottom: 2px;
+  font-size: 0.95rem;
 }
 
 .menu-lateral .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
 }
 
 .menu-lateral .nav-link.activo {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: var(--azul-marino-claro);
+  color: #ffffff;
+}
+
+.menu-abajo {
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+}
+
+/* ---------- Barra superior (blanca) ---------- */
+.barra-superior {
+  height: 64px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--borde);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 0 24px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #dfe5ee;
+  color: var(--azul-marino);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.usuario-nombre {
+  font-weight: 500;
+}
+
+.btn-icono {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--azul);
+  background-color: #ffffff;
+  text-decoration: none;
+}
+
+.btn-icono:hover {
+  background-color: var(--fondo);
+}
+
+.area-principal {
+  padding: 24px;
+}
+
+/* ---------- Tarjetas ---------- */
+.tarjeta {
+  background-color: #ffffff;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+  padding: 18px 20px;
+}
+
+.tarjeta-titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: -2px -20px 16px;
+  padding: 0 20px 14px;
+  border-bottom: 1px solid var(--borde);
+}
+
+/* Tarjetas de números del Dashboard */
+.tarjeta-numero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 22px;
+}
+
+.tarjeta-numero::after {           /* la línea de color de abajo */
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 85%;
+  height: 4px;
+  background-color: var(--azul);
+}
+
+.tarjeta-numero.verde::after {
+  background-color: var(--verde);
+  width: 100%;
+}
+
+.tarjeta-numero.naranja::after {
+  background-color: var(--naranja);
+  width: 100%;
+}
+
+.icono-cuadro {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: var(--azul);
+  color: #ffffff;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icono-cuadro.verde { background-color: var(--verde); }
+.icono-cuadro.naranja { background-color: var(--naranja); }
+
+.numero {
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.etiqueta {
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+/* ---------- Botones ---------- */
+.btn-siguet {
+  background-color: var(--azul);
+  border-color: var(--azul);
+  color: #ffffff;
+}
+
+.btn-siguet:hover,
+.btn-siguet:focus {
+  background-color: #2459b5;
+  border-color: #2459b5;
+  color: #ffffff;
+}
+
+.btn-siguet-borde {
+  border: 1px solid var(--azul);
+  color: var(--azul);
+  background-color: #ffffff;
+}
+
+.btn-siguet-borde:hover {
+  background-color: #eaf1fc;
+  color: var(--azul);
+}
+
+/* ---------- Interruptores (restricciones blandas) ---------- */
+.form-switch .form-check-input {
+  width: 2.6em;
+  height: 1.35em;
+  cursor: pointer;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: var(--azul);
+  border-color: var(--azul);
+}
+
+.form-check-label {
+  cursor: pointer;
+  padding-left: 6px;
+}
+
+/* ---------- Tablas ---------- */
+.tabla-siguet thead th {
+  background-color: #eef2f7;
+  font-weight: 600;
+  border-bottom: none;
+}
+
+.tabla-siguet td,
+.tabla-siguet th {
+  padding: 10px 12px;
+}
+
+/* ---------- Barra de progreso ---------- */
+.progress {
+  height: 8px;
+  background-color: var(--azul-marino);
+}
+
+.progress-bar {
+  background-color: var(--azul);
+}
+
+/* ---------- Login ---------- */
+.fondo-login {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e6e9ee 0%, #cfd4dc 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tarjeta-login {
+  width: 380px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(16, 24, 40, 0.15);
+  padding: 34px 32px;
+}
+
+.login-titulo {
+  color: var(--azul-oscuro);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.btn-login {
+  background-color: var(--azul-oscuro);
+  color: #ffffff;
+  border-radius: 20px;
   font-weight: 600;
 }
 
-.tarjeta {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  padding: 20px 24px;
+.btn-login:hover {
+  background-color: #1a3c78;
+  color: #ffffff;
+}
+
+/* ---------- Celular y tableta (RNF-15) ---------- */
+@media (max-width: 768px) {
+  .layout { flex-direction: column; }
+  .menu-lateral { width: 100%; }
+  .menu-abajo { margin-top: 8px; }
 }

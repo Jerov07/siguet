@@ -1,6 +1,7 @@
-from django.urls import path
-from nucleo import views
+from django.urls import path, include
 
 urlpatterns = [
-    path('restricciones/', views.lista_restricciones),
+    path('cuentas/', include('cuentas.urls')),
+    path('generacion/', include('generacion.urls')),
+    path('', include('consultas.urls')),
 ]

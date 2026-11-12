@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Dashboard{% endblock %}
+
+{% block contenido %}
+
+<!-- ===== Fila 1: tarjetas de números ===== -->
+<div class="row g-3 mb-3">
+  <div class="col-md-6 col-xl-3">
+    <div class="tarjeta tarjeta-numero">
+      <div class="icono-cuadro"><i class="bi bi-book"></i></div>
+      <div><div class="numero">{{ total_materias }}</div><div class="etiqueta">Materias</div></div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="tarjeta tarjeta-numero">
+      <div class="icono-cuadro"><i class="bi bi-person"></i></div>
+      <div><div class="numero">{{ total_docentes }}</div><div class="etiqueta">Docentes Activos</div></div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <div class="tarjeta tarjeta-numero">
+      <div class="icono-cuadro"><i class="bi bi-bank"></i></div>
+      <div><div class="numero">{{ total_aulas }}</div><div class="etiqueta">Aulas Registradas</div></div>
+    </div>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    {% if not ultima_ejecucion %}
+    <div class="tarjeta tarjeta-numero naranja">
+      <div class="icono-cuadro naranja"><i class="bi bi-hourglass-split"></i></div>
+      <div><div class="etiqueta">Estado Horario:</div><div class="numero fs-4">Sin generar</div></div>
+    </div>
+    {% elif ultima_ejecucion.estado == 'completa' %}
+    <div class="tarjeta tarjeta-numero verde">
+      <div class="icono-cuadro verde"><i class="bi bi-check-circle"></i></div>
+      <div>
+        <div class="etiqueta">Estado Horario:</div>
+        <div class="numero fs-4">Generado</div>
+        <div class="small text-success">(100 % sin conflictos)</div>
+      </div>
+    </div>
+    {% else %}
+    <div class="tarjeta tarjeta-numero naranja">
+      <div class="icono-cuadro naranja"><i class="bi bi-exclamation-triangle"></i></div>
+      <div>
+        <div class="etiqueta">Estado Horario:</div>
+        <div class="numero fs-4">{{ ultima_ejecucion.get_estado_display }}</div>
+        <div class="small" style="color: var(--naranja);">({{ total_conflictos }} conflicto{{ total_conflictos|pluralize }})</div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ===== Fila 2: botones (solo administrador) ===== -->
+{% if request.session.perfil == 'administrador' %}
+<div class="row g-3 mb-3">
+  <div class="col-lg-8">
+    <a href="/generacion/" class="btn btn-siguet w-100 py-2"><i class="bi bi-calendar-plus"></i> Generar Horario Automático</a>
+  </div>
+  <div class="col-lg-4">
+    <a href="/generacion/" class="btn btn-siguet-borde w-100 py-2">Configurar Restricciones</a>
+  </div>
+</div>
+{% endif %}
+
+<!-- ===== Fila 3: última generación y ocupación ===== -->
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-titulo">Última Generación</div>
+      {% if ultima_ejecucion %}
+        <ul class="list-unstyled mb-0">
+          <li class="d-flex gap-3 mb-3"><i class="bi bi-calendar-event fs-5 text-secondary"></i>
+            <div>Fecha<div class="small text-secondary">{{ ultima_ejecucion.fecha|date:"d/m/Y h:i A" }}</div></div></li>
+          <li class="d-flex gap-3 mb-3"><i class="bi bi-person fs-5 text-secondary"></i>
+            <div>Generado por<div class="small text-secondary">{{ ultima_ejecucion.usuario.nombre_completo|default:"—" }}</div></div></li>
+          <li class="d-flex gap-3 mb-3"><i class="bi bi-check2-square fs-5 text-secondary"></i>
+            <div>Clases asignadas<div class="small text-secondary">{{ ultima_ejecucion.clases_asignadas }} de {{ ultima_ejecucion.clases_totales }}</div></div></li>
+          <li class="d-flex gap-3"><i class="bi bi-exclamation-diamond fs-5 text-secondary"></i>
+            <div>Conflictos<div class="small text-secondary">{{ total_conflictos }}</div></div></li>
+        </ul>
+      {% else %}
+        <div class="text-center text-secondary py-4">
+          <i class="bi bi-calendar-x fs-1"></i>
+          <p class="mt-2 mb-0">Aún no se ha generado ningún horario.</p>
+        </div>
+      {% endif %}
+      <div class="text-end mt-3"><a href="/consultas/reportes/" class="small text-decoration-none">Ver reporte completo</a></div>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-titulo">Ocupación de Aulas y Espacios</div>
+      {% if hay_asignaciones %}
+      <div class="row">
+        <div class="col-md-7">
+          <div class="fw-semibold small mb-2">Uso Promedio por Día</div>
+          <canvas id="grafica-ocupacion" height="200"></canvas>
+        </div>
+        <div class="col-md-5">
+          <div class="fw-semibold small mb-3">Aulas Más Utilizadas</div>
+          {% for aula in aulas_top %}
+            <div class="d-flex justify-content-between small"><span>{{ aula.codigo }}</span><span>{{ aula.porcentaje }} %</span></div>
+            <div class="progress mb-3" style="height: 6px; background-color: var(--borde);">
+              <div class="progress-bar" style="width: {{ aula.porcentaje }}%;"></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% else %}
+        <div class="text-center text-secondary py-4">
+          <i class="bi bi-bar-chart fs-1"></i>
+          <p class="mt-2 mb-0">La ocupación aparecerá cuando se genere el primer horario.</p>
+        </div>
+      {% endif %}
+      <div class="text-end mt-3"><a href="/consultas/reportes/" class="small text-decoration-none">Ver reporte completo</a></div>
+    </div>
+  </div>
+</div>
+
+{{ ocupacion_dias|json_script:"datos-ocupacion" }}
+{% endblock %}
+
+{% block scripts %}
+{% if hay_asignaciones %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"></script>
+<script>
+  const datos = JSON.parse(document.getElementById('datos-ocupacion').textContent);
+  new Chart(document.getElementById('grafica-ocupacion'), {
+    type: 'bar',
+    data: {
+      labels: datos.map(d => d.dia),
+      datasets: [{ data: datos.map(d => d.porcentaje), backgroundColor: '#2c6bd6', borderRadius: 4 }]
+    },
+    options: {
+      plugins: { legend: { display: false } },
+      scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}
