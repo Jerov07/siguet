@@ -340,15 +340,15 @@ CREATE INDEX idx_clase_grupo        ON clase (grupo_id);
 -- ============================================================
 
 INSERT INTO restriccion_blanda (codigo, nombre, descripcion, activa, peso) VALUES
- ('RB_VENTANAS',    'Evitar ventanas prolongadas',
+ ('RB_VENTANAS',    'Evitar huecos prolongados',
   'Evitar espacios vacíos largos entre clases de un mismo grupo o docente.', TRUE,  4),
- ('RB_PREF_DOCENTE','Respetar preferencias del docente',
+ ('RB_PREF_DOCENTE','Priorizar profesores preferidos',
   'Procurar asignar al docente en sus franjas preferidas.',                  TRUE,  3),
- ('RB_EQUILIBRIO',  'Distribuir las clases en la semana',
+ ('RB_EQUILIBRIO',  'Equilibrar carga semanal',
   'Evitar concentrar la carga de un grupo en pocos días.',                   FALSE, 2),
  ('RB_CONSECUTIVAS','Evitar clases consecutivas excesivas',
   'Limitar el número de bloques seguidos de un docente o grupo.',            FALSE, 2),
- ('RB_CAMBIO_AULA', 'Reducir cambios de aula',
+ ('RB_CAMBIO_AULA', 'Minimizar cambios de aula',
   'Procurar que un grupo permanezca en la misma aula.',                      FALSE, 1);
 
 

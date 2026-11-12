@@ -1,0 +1,53 @@
+{% extends plantilla %}
+
+{% block titulo %}Ajustes{% endblock %}
+
+{% block contenido %}
+{% for mensaje in messages %}
+  <div class="alert {% if mensaje.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} py-2">{{ mensaje }}</div>
+{% endfor %}
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-titulo"><i class="bi bi-person-circle"></i> Mi cuenta</div>
+      <dl class="row mb-0">
+        <dt class="col-5">Usuario</dt><dd class="col-7">{{ usuario.nombre_usuario }}</dd>
+        <dt class="col-5">Nombre</dt><dd class="col-7">{{ usuario.nombre_completo }}</dd>
+        <dt class="col-5">Perfil</dt><dd class="col-7">{{ usuario.get_perfil_display }}</dd>
+        {% if usuario.perfil == 'consultor' %}
+        <dt class="col-5">Docente vinculado</dt>
+        <dd class="col-7">{% if usuario.docente %}{{ usuario.docente.nombre }} ({{ usuario.docente.identificacion }}){% else %}Sin vincular{% endif %}</dd>
+        {% endif %}
+        <dt class="col-5">Cuenta creada</dt><dd class="col-7">{{ usuario.fecha_creacion|date:"d/m/Y" }}</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-titulo"><i class="bi bi-shield-lock"></i> Cambiar contraseña</div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label small" for="actual">Contraseña actual</label>
+          <input type="password" class="form-control" id="actual" name="actual" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small" for="nueva">Nueva contraseña</label>
+          <input type="password" class="form-control" id="nueva" name="nueva" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label small" for="confirmar">Confirmar nueva contraseña</label>
+          <input type="password" class="form-control" id="confirmar" name="confirmar" required>
+        </div>
+        <button type="submit" class="btn btn-siguet">Guardar contraseña</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <a href="{% url 'logout' %}" class="btn btn-outline-secondary"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
+</div>
+{% endblock %}

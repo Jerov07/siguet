@@ -1,8 +1,8 @@
 from django.db.models import Count
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from cuentas.decoradores import requiere_perfil
-from nucleo.models import (Asignacion, Asignatura, Aula, Conflicto, Docente,
+from nucleo.models import (Asignacion, Asignatura, Aula, Clase, Conflicto, Docente,
                            Ejecucion, FranjaHoraria, Grupo, Usuario, DIAS_SEMANA)
 
 AMBOS = ('administrador', 'consultor')
@@ -17,6 +17,10 @@ def _porcentaje(parte, total):
 
 @requiere_perfil(*AMBOS)
 def dashboard(request):
+    # El docente no tiene Dashboard en el mockup: su página de inicio es "Mis Horarios"
+    if request.session.get('perfil') != 'administrador':
+        return redirect('mis_horarios')
+
     total_aulas = Aula.objects.count()
     ultima = Ejecucion.objects.first()   # solo se guarda la última ejecución
 
@@ -37,7 +41,23 @@ def dashboard(request):
         for fila in Asignacion.objects.values('aula__codigo').annotate(n=Count('id')).order_by('-n')[:3]
     ]
 
+    # Actividad reciente: se arma con los datos que sí guarda la base
+    # (última generación, conflictos y usuarios creados), ordenada por fecha.
+    actividad = []
+    if ultima:
+        actividad.append({'icono': 'bi-calendar3', 'texto': f'Horario generado ({ultima.get_estado_display().lower()})',
+                          'detalle': f'por {ultima.usuario.nombre_completo}' if ultima.usuario else '',
+                          'fecha': ultima.fecha})
+        for c in Conflicto.objects.select_related('clase__asignatura', 'clase__grupo')[:2]:
+            actividad.append({'icono': 'bi-exclamation-triangle', 'texto': f'Conflicto: {c.clase.asignatura.nombre} ({c.clase.grupo.codigo})',
+                              'detalle': c.restriccion, 'fecha': ultima.fecha})
+    for u in Usuario.objects.order_by('-fecha_creacion')[:4]:
+        actividad.append({'icono': 'bi-person-plus', 'texto': f'Nuevo usuario añadido: {u.nombre_completo}',
+                          'detalle': u.get_perfil_display(), 'fecha': u.fecha_creacion})
+    actividad = sorted(actividad, key=lambda x: x['fecha'], reverse=True)[:4]
+
     return render(request, 'consultas/dashboard.html', {
+        'actividad': actividad,
         'total_materias': Asignatura.objects.count(),
         'total_docentes': Docente.objects.filter(activo=True).count(),
         'total_aulas': total_aulas,
@@ -79,23 +99,23 @@ def _cuadricula(filtro):
     return dias, filas
 
 
-@requiere_perfil(*AMBOS)
+@requiere_perfil('administrador')
 def horario(request):
     """Vista semanal del horario, filtrada por grupo, docente o aula (función 8)."""
     vista = request.GET.get('vista', 'grupo')
     if vista not in ('grupo', 'docente', 'aula'):
         vista = 'grupo'
 
-    opciones = {
-        'grupo': [(g.id, g.codigo) for g in Grupo.objects.order_by('codigo')],
+    listas = {
+        'grupo': [(g.id, f'{g.codigo} {g.programa or ""}'.strip()) for g in Grupo.objects.order_by('codigo')],
         'docente': [(d.id, d.nombre) for d in Docente.objects.order_by('nombre')],
         'aula': [(a.id, a.codigo) for a in Aula.objects.order_by('codigo')],
-    }[vista]
+    }
 
     # Elemento escogido: el que viene en la dirección o, si no, el primero de la lista
     seleccionado = request.GET.get('id')
-    if not seleccionado and opciones:
-        seleccionado = str(opciones[0][0])
+    if not seleccionado and listas[vista]:
+        seleccionado = str(listas[vista][0][0])
 
     if seleccionado:
         dias, filas = _cuadricula({f'{vista}_id': seleccionado})
@@ -104,7 +124,9 @@ def horario(request):
 
     return render(request, 'consultas/horario.html', {
         'vista': vista,
-        'opciones': opciones,
+        'grupos': listas['grupo'],
+        'docentes': listas['docente'],
+        'aulas': listas['aula'],
         'seleccionado': seleccionado,
         'dias': dias,
         'filas': filas,
@@ -128,25 +150,37 @@ def mis_horarios(request):
     })
 
 
-@requiere_perfil(*AMBOS)
+def _docente_de(request):
+    """Devuelve el docente vinculado al usuario que inició sesión (o None)."""
+    usuario = Usuario.objects.select_related('docente').get(id=request.session['usuario_id'])
+    return usuario.docente
+
+
+@requiere_perfil('consultor')
 def asignaturas(request):
-    """Materias registradas y en cuántos grupos se dictan (solo consulta)."""
-    lista = (Asignatura.objects.annotate(grupos=Count('clase', distinct=True))
-             .order_by('nombre'))
-    return render(request, 'consultas/asignaturas.html', {'asignaturas': lista})
+    """Materias que dicta el docente, con su grupo y sesiones (solo consulta)."""
+    docente = _docente_de(request)
+    clases = []
+    if docente:
+        clases = (Clase.objects.filter(docente=docente)
+                  .select_related('asignatura', 'grupo')
+                  .order_by('asignatura__nombre', 'grupo__codigo'))
+    return render(request, 'consultas/asignaturas.html', {'docente': docente, 'clases': clases})
 
 
-@requiere_perfil(*AMBOS)
+@requiere_perfil('consultor')
 def aulas(request):
-    """Aulas con su capacidad, tipo y ocupación (solo consulta)."""
-    total_franjas = FranjaHoraria.objects.count()
-    lista = Aula.objects.annotate(usos=Count('asignacion')).order_by('codigo')
-    for aula in lista:
-        aula.ocupacion = _porcentaje(aula.usos, total_franjas)
-    return render(request, 'consultas/aulas.html', {'aulas': lista})
+    """Aulas asignadas al docente: dónde y cuándo dicta cada clase (solo consulta)."""
+    docente = _docente_de(request)
+    asignaciones = []
+    if docente:
+        asignaciones = (Asignacion.objects.filter(docente=docente)
+                        .select_related('aula', 'franja', 'grupo', 'clase__asignatura')
+                        .order_by('franja__dia_semana', 'franja__hora_inicio'))
+    return render(request, 'consultas/aulas.html', {'docente': docente, 'asignaciones': asignaciones})
 
 
-@requiere_perfil(*AMBOS)
+@requiere_perfil('administrador')
 def reportes(request):
     """Conflictos, materias no programadas y ocupación de aulas (función 9)."""
     total_franjas = FranjaHoraria.objects.count()

@@ -113,16 +113,40 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background-color: #dfe5ee;
-  color: var(--azul-marino);
+  background-color: #cfd6e0;
+  color: #ffffff;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  font-weight: 700;
+  overflow: hidden;
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
 .usuario-nombre {
   font-weight: 500;
+}
+
+/* Campana de avisos con su globito rojo */
+.campana {
+  position: relative;
+}
+
+.campana .globo {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background-color: var(--azul);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-icono {
@@ -228,6 +252,13 @@ body {
   background-color: var(--azul);
   border-color: var(--azul);
   color: #ffffff;
+}
+
+.btn-siguet:disabled {
+  background-color: var(--azul);
+  border-color: var(--azul);
+  color: #ffffff;
+  opacity: 0.75;
 }
 
 .btn-siguet:hover,
@@ -373,4 +404,240 @@ body {
 .clase-nombre {
   font-weight: 700;
   text-transform: uppercase;
+}
+
+
+/* =========================================================
+   Estilo del mockup "Generar Horario"
+   ========================================================= */
+.barra-oscura {
+  height: 64px;
+  background-color: #263247;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 22px;
+}
+
+.marca-oscura {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.marca-oscura i {
+  color: #7fb0f0;
+}
+
+.marca-oscura:hover {
+  color: #ffffff;
+}
+
+.avatar-claro {
+  text-decoration: none;
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #e3e7ed;
+  color: #b3bcc8;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 1.7rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.icono-oscuro {
+  color: #aab4c3;
+  font-size: 1.1rem;
+  text-decoration: none;
+}
+
+.icono-oscuro:hover {
+  color: #ffffff;
+}
+
+.layout-generar {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+.menu-degradado {
+  width: 230px;
+  flex-shrink: 0;
+  padding: 16px 10px;
+  background: linear-gradient(180deg, #4a8fe0 0%, #2a4f8f 45%, #1f2d4a 100%);
+}
+
+.menu-degradado .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+}
+
+.menu-degradado .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.menu-degradado .nav-link.activo {
+  background-color: #dfe9f8;
+  color: #1f2d4a;
+}
+
+.area-generar {
+  flex-grow: 1;
+  min-width: 0;
+  padding: 28px;
+}
+
+.estilo-generar .tarjeta {
+  border-radius: 8px;
+}
+
+.estilo-generar .tarjeta-titulo {
+  font-size: 1.2rem;
+}
+
+.btn-gris {
+  background-color: #8a929c;
+  color: #ffffff;
+  border: none;
+}
+
+.btn-gris:hover,
+.btn-gris:disabled {
+  background-color: #737b85;
+  color: #ffffff;
+}
+
+/* =========================================================
+   Estilo del mockup "Vista semanal del horario"
+   ========================================================= */
+.estilo-horario {
+  background-color: #eef2f7;
+}
+
+.barra-horario {
+  margin: 22px 28px 0;
+  background-color: #1f2d4a;
+  border-radius: 8px;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  color: #ffffff;
+}
+
+.marca-horario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.marca-horario i {
+  font-size: 2rem;
+}
+
+.marca-horario .nombre {
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.marca-horario .lema {
+  font-size: 0.78rem;
+  line-height: 1.2;
+  color: #d5dcea;
+}
+
+.marca-horario:hover {
+  color: #ffffff;
+}
+
+.usuario-horario {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  line-height: 1.25;
+  margin-left: 40px;
+}
+
+.nav-horario {
+  margin-left: auto;
+  display: flex;
+  gap: 26px;
+  align-items: center;
+}
+
+.nav-horario a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.nav-horario a:hover,
+.nav-horario a.activo {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.area-horario {
+  padding: 18px 28px 28px;
+}
+
+.filtros-horario .form-select {
+  width: auto;
+  font-size: 0.85rem;
+  min-width: 170px;
+}
+
+.vistas-corchetes a {
+  color: #8a94a6;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.vistas-corchetes a.activa {
+  color: #1f2937;
+}
+
+.tabla-horario {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.08);
+}
+
+.tabla-horario .table {
+  margin-bottom: 0;
+}
+
+.tabla-horario th {
+  background-color: #ffffff;
+}
+
+@media (max-width: 992px) {
+  .barra-horario { flex-wrap: wrap; gap: 14px; }
+  .usuario-horario { margin-left: 0; }
+  .nav-horario { margin-left: 0; flex-wrap: wrap; gap: 16px; }
+}
+
+@media (max-width: 768px) {
+  .layout-generar { flex-direction: column; }
+  .menu-degradado { width: 100%; }
 }

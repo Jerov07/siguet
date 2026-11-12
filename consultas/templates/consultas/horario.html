@@ -1,30 +1,53 @@
-{% extends 'base.html' %}
+{% extends 'base_horario.html' %}
 
 {% block titulo %}Horarios{% endblock %}
 
 {% block contenido %}
-<div class="tarjeta">
-  <!-- Filtros: qué vista y qué grupo/docente/aula -->
-  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
-    <form method="get" class="d-flex gap-2 align-items-center">
-      <input type="hidden" name="vista" value="{{ vista }}">
-      <label class="fw-semibold text-capitalize" for="selector">{{ vista }}:</label>
-      <select id="selector" name="id" class="form-select" style="min-width: 220px;" onchange="this.form.submit()">
-        {% for valor, texto in opciones %}
-          <option value="{{ valor }}" {% if seleccionado == valor|stringformat:"s" %}selected{% endif %}>{{ texto }}</option>
-        {% empty %}
-          <option>No hay registros</option>
-        {% endfor %}
-      </select>
-    </form>
-
-    <div class="vistas small">
-      <a href="?vista=grupo" class="{% if vista == 'grupo' %}activa{% endif %}">Vista por Grupo</a> |
-      <a href="?vista=docente" class="{% if vista == 'docente' %}activa{% endif %}">Vista por Docente</a> |
-      <a href="?vista=aula" class="{% if vista == 'aula' %}activa{% endif %}">Vista por Aula</a>
-    </div>
+<!-- ===== Filtros (igual al mockup): Grupo, Docente, Aula ===== -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3 filtros-horario">
+  <div class="d-flex flex-wrap gap-2">
+    <select class="form-select form-select-sm filtro" data-vista="grupo">
+      {% if vista != 'grupo' %}<option value="" selected>Grupo</option>{% endif %}
+      {% for valor, texto in grupos %}
+        <option value="{{ valor }}" {% if vista == 'grupo' and seleccionado == valor|stringformat:"s" %}selected{% endif %}>Grupo: {{ texto }}</option>
+      {% endfor %}
+    </select>
+    <select class="form-select form-select-sm filtro" data-vista="docente">
+      {% if vista != 'docente' %}<option value="" selected>Docente</option>{% endif %}
+      {% for valor, texto in docentes %}
+        <option value="{{ valor }}" {% if vista == 'docente' and seleccionado == valor|stringformat:"s" %}selected{% endif %}>Docente: {{ texto }}</option>
+      {% endfor %}
+    </select>
+    <select class="form-select form-select-sm filtro" data-vista="aula">
+      {% if vista != 'aula' %}<option value="" selected>Aula</option>{% endif %}
+      {% for valor, texto in aulas %}
+        <option value="{{ valor }}" {% if vista == 'aula' and seleccionado == valor|stringformat:"s" %}selected{% endif %}>Aula: {{ texto }}</option>
+      {% endfor %}
+    </select>
   </div>
 
+  <div class="vistas-corchetes">
+    <a href="?vista=grupo" class="{% if vista == 'grupo' %}activa{% endif %}">[Vista por Grupo]</a> |
+    <a href="?vista=docente" class="{% if vista == 'docente' %}activa{% endif %}">[Vista por Docente]</a> |
+    <a href="?vista=aula" class="{% if vista == 'aula' %}activa{% endif %}">[Vista por Aula]</a>
+  </div>
+</div>
+
+<!-- ===== Cuadrícula semanal ===== -->
+<div class="tabla-horario">
   {% include 'consultas/_cuadricula.html' %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Al escoger un grupo, docente o aula, se recarga la página con ese filtro
+  document.querySelectorAll('.filtro').forEach(function (lista) {
+    lista.addEventListener('change', function () {
+      if (lista.value) {
+        location.href = '?vista=' + lista.dataset.vista + '&id=' + lista.value;
+      }
+    });
+  });
+</script>
 {% endblock %}

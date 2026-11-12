@@ -1,29 +1,34 @@
-{% extends 'base.html' %}
+{% extends 'base_generar.html' %}
 
 {% block titulo %}Asignaturas{% endblock %}
 
 {% block contenido %}
+{% if docente %}
 <div class="tarjeta">
-  <div class="tarjeta-titulo"><i class="bi bi-book"></i> Asignaturas</div>
+  <div class="tarjeta-titulo"><i class="bi bi-list-ul"></i> Mis Asignaturas</div>
   <div class="table-responsive">
     <table class="table tabla-siguet mb-0">
       <thead>
-        <tr><th>Código</th><th>Nombre</th><th>Horas semanales</th><th>Tipo de aula</th><th>Grupos</th></tr>
+        <tr><th>Código</th><th>Asignatura</th><th>Grupo</th><th>Horas semanales</th><th>Sesiones</th><th>Tipo de aula</th></tr>
       </thead>
       <tbody>
-        {% for a in asignaturas %}
+        {% for c in clases %}
         <tr>
-          <td>{{ a.codigo }}</td>
-          <td>{{ a.nombre }}</td>
-          <td>{{ a.intensidad_horaria }}</td>
-          <td>{{ a.get_tipo_aula_requerida_display }}</td>
-          <td>{{ a.grupos }}</td>
+          <td>{{ c.asignatura.codigo }}</td>
+          <td>{{ c.asignatura.nombre }}</td>
+          <td>{{ c.grupo.codigo }}</td>
+          <td>{{ c.asignatura.intensidad_horaria }}</td>
+          <td>{{ c.sesiones_semanales }}</td>
+          <td>{{ c.asignatura.get_tipo_aula_requerida_display }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-center text-secondary py-4">No hay asignaturas registradas.</td></tr>
+        <tr><td colspan="6" class="text-center text-secondary py-4">Todavía no tienes asignaturas asignadas.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
+{% else %}
+  {% include 'consultas/_sin_vinculo.html' %}
+{% endif %}
 {% endblock %}

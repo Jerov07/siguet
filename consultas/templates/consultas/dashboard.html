@@ -67,26 +67,28 @@
 <!-- ===== Fila 3: última generación y ocupación ===== -->
 <div class="row g-3">
   <div class="col-lg-5">
-    <div class="tarjeta h-100">
-      <div class="tarjeta-titulo">Última Generación</div>
-      {% if ultima_ejecucion %}
-        <ul class="list-unstyled mb-0">
-          <li class="d-flex gap-3 mb-3"><i class="bi bi-calendar-event fs-5 text-secondary"></i>
-            <div>Fecha<div class="small text-secondary">{{ ultima_ejecucion.fecha|date:"d/m/Y h:i A" }}</div></div></li>
-          <li class="d-flex gap-3 mb-3"><i class="bi bi-person fs-5 text-secondary"></i>
-            <div>Generado por<div class="small text-secondary">{{ ultima_ejecucion.usuario.nombre_completo|default:"—" }}</div></div></li>
-          <li class="d-flex gap-3 mb-3"><i class="bi bi-check2-square fs-5 text-secondary"></i>
-            <div>Clases asignadas<div class="small text-secondary">{{ ultima_ejecucion.clases_asignadas }} de {{ ultima_ejecucion.clases_totales }}</div></div></li>
-          <li class="d-flex gap-3"><i class="bi bi-exclamation-diamond fs-5 text-secondary"></i>
-            <div>Conflictos<div class="small text-secondary">{{ total_conflictos }}</div></div></li>
+    <div class="tarjeta h-100 d-flex flex-column">
+      <div class="tarjeta-titulo">Actividad Reciente</div>
+      {% if actividad %}
+        <ul class="list-unstyled mb-0 flex-grow-1">
+          {% for item in actividad %}
+          <li class="d-flex gap-3 mb-3">
+            <i class="bi {{ item.icono }} fs-5 text-secondary"></i>
+            <div>
+              {{ item.texto }}
+              {% if item.detalle %}<div class="small text-secondary">{{ item.detalle }}</div>{% endif %}
+              <div class="small text-secondary">{{ item.fecha|date:"d/m/Y h:i A" }}</div>
+            </div>
+          </li>
+          {% endfor %}
         </ul>
       {% else %}
-        <div class="text-center text-secondary py-4">
-          <i class="bi bi-calendar-x fs-1"></i>
-          <p class="mt-2 mb-0">Aún no se ha generado ningún horario.</p>
+        <div class="text-center text-secondary py-4 flex-grow-1">
+          <i class="bi bi-clock-history fs-1"></i>
+          <p class="mt-2 mb-0">Todavía no hay actividad.</p>
         </div>
       {% endif %}
-      <div class="text-end mt-3"><a href="/consultas/reportes/" class="small text-decoration-none">Ver reporte completo</a></div>
+      <div class="text-end mt-2"><a href="/consultas/reportes/" class="small text-decoration-none">Ver toda la actividad</a></div>
     </div>
   </div>
 
@@ -134,6 +136,21 @@
       labels: datos.map(d => d.dia),
       datasets: [{ data: datos.map(d => d.porcentaje), backgroundColor: '#2c6bd6', borderRadius: 4 }]
     },
+    plugins: [{
+      // Escribe el porcentaje encima de cada barra, como en el mockup
+      id: 'porcentajes',
+      afterDatasetsDraw(grafica) {
+        const ctx = grafica.ctx;
+        ctx.save();
+        ctx.font = '11px sans-serif';
+        ctx.fillStyle = '#374151';
+        ctx.textAlign = 'center';
+        grafica.getDatasetMeta(0).data.forEach(function (barra, i) {
+          ctx.fillText(datos[i].porcentaje + '%', barra.x, barra.y - 5);
+        });
+        ctx.restore();
+      }
+    }],
     options: {
       plugins: { legend: { display: false } },
       scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }

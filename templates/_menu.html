@@ -1,0 +1,19 @@
+{# Opciones del menú lateral según el perfil. Se usa en base.html y en base_generar.html. #}
+{% if request.session.perfil == 'administrador' %}
+<a class="nav-link {% if request.path == '/' %}activo{% endif %}" href="/"><i class="bi bi-speedometer2"></i> Dashboard</a>
+<a class="nav-link {% if '/catalogo/asignaturas/' in request.path %}activo{% endif %}" href="/catalogo/asignaturas/"><i class="bi bi-book"></i> Materias</a>
+<a class="nav-link {% if '/catalogo/docentes/' in request.path %}activo{% endif %}" href="/catalogo/docentes/"><i class="bi bi-person"></i> Docentes</a>
+<a class="nav-link {% if '/catalogo/grupos/' in request.path %}activo{% endif %}" href="/catalogo/grupos/"><i class="bi bi-people"></i> Grupos Académicos</a>
+<a class="nav-link {% if '/catalogo/aulas/' in request.path %}activo{% endif %}" href="/catalogo/aulas/"><i class="bi bi-bank"></i> Aulas y Espacios</a>
+<a class="nav-link {% if '/catalogo/franjas/' in request.path %}activo{% endif %}" href="/catalogo/franjas/"><i class="bi bi-clock"></i> Franjas Horarias</a>
+<a class="nav-link {% if '/catalogo/clases/' in request.path %}activo{% endif %}" href="/catalogo/clases/"><i class="bi bi-easel"></i> Clases</a>
+<a class="nav-link {% if '/generacion/' in request.path %}activo{% endif %}" href="/generacion/"><i class="bi bi-calendar-plus"></i> Generar Horario</a>
+<a class="nav-link {% if '/consultas/horario/' in request.path %}activo{% endif %}" href="/consultas/horario/"><i class="bi bi-search"></i> Consultas</a>
+<a class="nav-link {% if '/consultas/reportes/' in request.path %}activo{% endif %}" href="/consultas/reportes/"><i class="bi bi-graph-up"></i> Reportes</a>
+{% else %}
+{# Menú del docente: exactamente el del mockup #}
+<a class="nav-link {% if '/consultas/mis-horarios/' in request.path %}activo{% endif %}" href="/consultas/mis-horarios/"><i class="bi bi-person-fill"></i> Mis Horarios</a>
+<a class="nav-link {% if '/generacion/' in request.path %}activo{% endif %}" href="/generacion/"><i class="bi bi-diagram-3"></i> Generar Horario</a>
+<a class="nav-link {% if '/consultas/asignaturas/' in request.path %}activo{% endif %}" href="/consultas/asignaturas/"><i class="bi bi-list-ul"></i> Asignaturas</a>
+<a class="nav-link {% if '/consultas/aulas/' in request.path %}activo{% endif %}" href="/consultas/aulas/"><i class="bi bi-easel2"></i> Aulas</a>
+{% endif %}
