@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from urllib.parse import parse_qsl, unquote, urlparse
 import os
 from dotenv import load_dotenv
 
@@ -24,12 +25,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!+aqg%ums_=4ei7z!^i63l55!c*#mfzol7^8b)stfz^=i2fuc-'
+# En el servidor (Render) se toman de las variables de entorno; en el PC se usan los valores de prueba.
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-!+aqg%ums_=4ei7z!^i63l55!c*#mfzol7^8b)stfz^=i2fuc-')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1'] + [h for h in os.getenv('ALLOWED_HOSTS', '').split(',') if h]
+CSRF_TRUSTED_ORIGINS = []
+# Render pone sola esta variable con la dirección pública de la página (…onrender.com)
+if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
+    CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['RENDER_EXTERNAL_HOSTNAME'])
 
 
 # Application definition
@@ -48,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # sirve el CSS en el servidor
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -89,6 +97,20 @@ DATABASES = {
     }
 }
 
+# En el servidor la base viene en una sola dirección: postgresql://usuario:clave@host/base?sslmode=require
+if os.getenv('DATABASE_URL'):
+    url = urlparse(os.environ['DATABASE_URL'])
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': url.path.lstrip('/'),
+        'USER': unquote(url.username or ''),
+        'PASSWORD': unquote(url.password or ''),
+        'HOST': url.hostname,
+        'PORT': url.port or 5432,
+        'OPTIONS': dict(parse_qsl(url.query)),
+        'CONN_MAX_AGE': 60,
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -126,6 +148,11 @@ USE_TZ = False  # las columnas TIMESTAMP de la base no guardan zona horaria
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # aquí junta collectstatic los archivos para el servidor
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage'},
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -137,3 +164,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # SESSION_SAVE_EVERY_REQUEST reinicia el contador con cada clic.
 SESSION_COOKIE_AGE = 30 * 60
 SESSION_SAVE_EVERY_REQUEST = True
+
+# Seguridad extra solo en el servidor (cuando DEBUG=False)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
