@@ -1,0 +1,18 @@
+{# Ventana y código para «Modificar horario manualmente». Lo usan Mis Horarios (docente) y Consultas (administrador). #}
+<!-- Ventana para mover una clase -->
+<div class="modal fade" id="ventana-mover" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-arrow-left-right"></i> Mover clase</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="clase-actual" class="mb-3 small"></div>
+        <div id="mensaje-mover" class="alert d-none"></div>
+        <div id="lista-opciones"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% csrf_token %}

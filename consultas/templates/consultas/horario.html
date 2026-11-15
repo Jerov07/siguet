@@ -33,10 +33,23 @@
   </div>
 </div>
 
+<div id="aviso-movida" class="alert alert-success d-none"><i class="bi bi-check-circle"></i> Clase movida correctamente.</div>
+
+{% if hay_clases %}
+<div class="d-flex justify-content-end mb-2">
+  <button class="btn btn-sm btn-siguet-borde" id="btn-modificar"><i class="bi bi-pencil-square"></i> Modificar horario manualmente</button>
+</div>
+<div id="instruccion" class="alert alert-info py-2 small d-none">
+  <i class="bi bi-hand-index"></i> Haga clic en una clase para cambiarla de día, hora o aula.
+  Solo se muestran los espacios libres que cumplen todas las reglas.
+</div>
+{% endif %}
+
 <!-- ===== Cuadrícula semanal ===== -->
 <div class="tabla-horario">
   {% include 'consultas/_cuadricula.html' %}
 </div>
+{% include 'consultas/_editor_modal.html' %}
 {% endblock %}
 
 {% block scripts %}
@@ -50,4 +63,5 @@
     });
   });
 </script>
+{% if hay_clases %}{% include 'consultas/_editor_js.html' %}{% endif %}
 {% endblock %}

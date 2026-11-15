@@ -15,11 +15,14 @@ def _conflicto(clase, restriccion, descripcion=''):
     return {'clase_id': clase['id'], 'restriccion': restriccion[:60], 'descripcion': descripcion}
 
 
-def generar(clases, franjas, aulas, disponibilidad, blandas, limite_segundos=LIMITE_SEGUNDOS):
+def generar(clases, franjas, aulas, disponibilidad, blandas, limite_segundos=LIMITE_SEGUNDOS, previas=()):
+    """previas: asignaciones que ya existen y no se tocan (para ubicar solo lo que falta)."""
     inicio = time.monotonic()
     ocupacion = duras.Ocupacion()
     franja_por_id = {f['id']: f for f in franjas}
-    asignaciones, conflictos = [], []
+    asignaciones, conflictos = list(previas), []
+    for previa in previas:
+        ocupacion.agregar(previa)
     clases_completas = 0
 
     # Primero las clases más difíciles de ubicar: menos franjas posibles y grupos más grandes
@@ -62,14 +65,14 @@ def generar(clases, franjas, aulas, disponibilidad, blandas, limite_segundos=LIM
 
     if clases and clases_completas == len(clases):
         estado = 'completa'
-    elif asignaciones:
+    elif len(asignaciones) > len(previas):
         estado = 'parcial'
     else:
         estado = 'fallida'
 
     return {
         'estado': estado,
-        'asignaciones': asignaciones,
+        'asignaciones': asignaciones[len(previas):],   # solo las nuevas
         'conflictos': conflictos,
         'clases_totales': len(clases),
         'clases_asignadas': clases_completas,

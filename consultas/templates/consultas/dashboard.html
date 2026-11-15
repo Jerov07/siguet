@@ -40,14 +40,14 @@
       </div>
     </div>
     {% else %}
-    <div class="tarjeta tarjeta-numero naranja">
+    <a href="/consultas/reportes/#conflictos" class="tarjeta tarjeta-numero naranja tarjeta-enlace">
       <div class="icono-cuadro naranja"><i class="bi bi-exclamation-triangle"></i></div>
       <div>
         <div class="etiqueta">Estado Horario:</div>
         <div class="numero fs-4">{{ ultima_ejecucion.get_estado_display }}</div>
         <div class="small" style="color: var(--naranja);">({{ total_conflictos }} conflicto{{ total_conflictos|pluralize }})</div>
       </div>
-    </div>
+    </a>
     {% endif %}
   </div>
 </div>
@@ -72,13 +72,15 @@
       {% if actividad %}
         <ul class="list-unstyled mb-0 flex-grow-1">
           {% for item in actividad %}
-          <li class="d-flex gap-3 mb-3">
+          <li>
+            <a href="{{ item.url }}" class="d-flex gap-3 mb-1 p-2 rounded actividad-enlace">
             <i class="bi {{ item.icono }} fs-5 text-secondary"></i>
             <div>
               {{ item.texto }}
               {% if item.detalle %}<div class="small text-secondary">{{ item.detalle }}</div>{% endif %}
               <div class="small text-secondary">{{ item.fecha|date:"d/m/Y h:i A" }}</div>
             </div>
+            </a>
           </li>
           {% endfor %}
         </ul>

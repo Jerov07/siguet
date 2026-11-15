@@ -8,4 +8,5 @@ urlpatterns = [
     path('ejecutar/', views.ejecutar, name='ejecutar'),
     path('asignacion/<int:id>/opciones/', views.opciones_asignacion, name='opciones_asignacion'),
     path('asignacion/<int:id>/mover/', views.mover_asignacion, name='mover_asignacion'),
+    path('asignar-pendientes/', views.asignar_pendientes, name='asignar_pendientes'),
 ]

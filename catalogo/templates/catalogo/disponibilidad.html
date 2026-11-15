@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Disponibilidad{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta">
+  <div class="tarjeta-titulo"><i class="bi bi-calendar-week"></i> Disponibilidad de {{ docente.nombre }}</div>
+  <p class="small text-secondary">Marque en qué franjas puede dictar clase el docente. «Preferida» le indica al algoritmo
+    que intente ubicarlo ahí primero (restricción «Priorizar profesores preferidos»).</p>
+
+  {% if filas %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
+        <thead>
+          <tr><th></th>{% for numero, nombre in dias %}<th>{{ nombre }}</th>{% endfor %}</tr>
+        </thead>
+        <tbody>
+          {% for fila in filas %}
+          <tr>
+            <th class="text-nowrap">{{ fila.hora }}</th>
+            {% for celda in fila.celdas %}
+            <td>
+              {% if celda.franja %}
+              <select name="franja_{{ celda.franja.id }}" class="form-select form-select-sm selector-disponibilidad">
+                <option value="no" {% if celda.estado == 'no' %}selected{% endif %}>No</option>
+                <option value="si" {% if celda.estado == 'si' %}selected{% endif %}>Disponible</option>
+                <option value="preferida" {% if celda.estado == 'preferida' %}selected{% endif %}>Preferida</option>
+              </select>
+              {% else %}<span class="text-secondary small">—</span>{% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-siguet"><i class="bi bi-check-lg"></i> Guardar disponibilidad</button>
+      <a href="{% url 'catalogo_lista' 'docentes' %}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+  {% else %}
+    <p class="text-secondary mb-0">Primero registre las franjas horarias en <a href="{% url 'catalogo_lista' 'franjas' %}">Franjas Horarias</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Colorear cada celda según lo escogido
+  function colorear(lista) {
+    const celda = lista.closest('td');
+    celda.style.backgroundColor = lista.value === 'preferida' ? '#d4edda' : lista.value === 'si' ? '#e7f1ff' : '';
+  }
+  document.querySelectorAll('.selector-disponibilidad').forEach(function (lista) {
+    colorear(lista);
+    lista.addEventListener('change', function () { colorear(lista); });
+  });
+</script>
+{% endblock %}

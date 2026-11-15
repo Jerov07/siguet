@@ -3,9 +3,6 @@
 {% block titulo %}Ajustes{% endblock %}
 
 {% block contenido %}
-{% for mensaje in messages %}
-  <div class="alert {% if mensaje.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} py-2">{{ mensaje }}</div>
-{% endfor %}
 
 <div class="row g-4">
   <div class="col-lg-6">

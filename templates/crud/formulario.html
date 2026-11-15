@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta" style="max-width: 760px;">
+  <div class="tarjeta-titulo"><i class="bi {{ icono }}"></i> {{ titulo }}</div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}<div class="alert alert-danger py-2">{{ error }}</div>{% endfor %}
+
+    {% for campo in form %}
+    <div class="mb-3">
+      {% if campo.widget_type == 'checkboxselectmultiple' %}
+        <label class="form-label fw-semibold small d-block">{{ campo.label }}</label>
+        <div class="row row-cols-1 row-cols-sm-2 g-1 border rounded p-2 mx-0">
+          {% for opcion in campo %}
+          <div class="col"><div class="form-check mb-0">
+            <input class="form-check-input" type="checkbox" name="{{ opcion.data.name }}" value="{{ opcion.data.value }}"
+                   id="{{ opcion.id_for_label }}" {% if opcion.data.selected %}checked{% endif %}>
+            <label class="form-check-label" for="{{ opcion.id_for_label }}">{{ opcion.choice_label }}</label>
+          </div></div>
+          {% endfor %}
+        </div>
+      {% elif campo.widget_type == 'checkbox' %}
+        <div class="form-check">
+          {{ campo }}
+          <label class="form-check-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        </div>
+      {% else %}
+        <label class="form-label fw-semibold small" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+        {{ campo }}
+      {% endif %}
+      {% if campo.help_text %}<div class="form-text">{{ campo.help_text }}</div>{% endif %}
+      {% for error in campo.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-siguet"><i class="bi bi-check-lg"></i> Guardar</button>
+      <a href="{{ url_volver }}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}{{ block.super }}{{ script_extra|safe }}{% endblock %}

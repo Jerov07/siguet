@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block titulo %}{{ titulo }}{% endblock %}
+
+{% block contenido %}
+<div class="tarjeta">
+  <div class="tarjeta-titulo justify-content-between">
+    <span><i class="bi {{ icono }}"></i> {{ titulo }} <span class="badge text-bg-light border">{{ filas|length }}</span></span>
+    <span class="d-flex gap-2">
+      {% for boton in botones_extra %}
+        {% if boton.post %}
+        <form method="post" action="{{ boton.url }}" class="d-inline">{% csrf_token %}
+          {% if boton.volver %}<input type="hidden" name="volver" value="{{ boton.volver }}">{% endif %}
+          <button class="btn btn-sm {{ boton.clase|default:'btn-siguet-borde' }}"><i class="bi {{ boton.icono }}"></i> {{ boton.texto }}</button>
+        </form>
+        {% else %}
+        <a href="{{ boton.url }}" class="btn btn-sm btn-siguet-borde"><i class="bi {{ boton.icono }}"></i> {{ boton.texto }}</a>
+        {% endif %}
+      {% endfor %}
+      <a href="{{ url_crear }}" class="btn btn-sm btn-siguet"><i class="bi bi-plus-lg"></i> Nuevo</a>
+    </span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table tabla-siguet align-middle mb-0">
+      <thead>
+        <tr>{% for c in columnas %}<th>{{ c }}</th>{% endfor %}<th class="text-end">Acciones</th></tr>
+      </thead>
+      <tbody>
+        {% for fila in filas %}
+        <tr>
+          {% for celda in fila.celdas %}<td>{{ celda }}</td>{% endfor %}
+          <td class="text-end text-nowrap">
+            {% for accion in fila.acciones %}
+              {% if accion.post %}
+              <form method="post" action="{{ accion.url }}" class="d-inline"
+                    {% if accion.confirmar %}onsubmit="return confirm('{{ accion.confirmar }}');"{% endif %}>
+                {% csrf_token %}
+                <button class="btn btn-sm {{ accion.clase|default:'btn-outline-secondary' }}" title="{{ accion.texto }}"><i class="bi {{ accion.icono }}"></i></button>
+              </form>
+              {% else %}
+              <a href="{{ accion.url }}" class="btn btn-sm {{ accion.clase|default:'btn-outline-secondary' }}" title="{{ accion.texto }}"><i class="bi {{ accion.icono }}"></i></a>
+              {% endif %}
+            {% endfor %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="{{ columnas|length|add:1 }}" class="text-center text-secondary py-4">No hay registros. Use el botón «Nuevo».</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

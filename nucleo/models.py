@@ -37,6 +37,9 @@ class Usuario(models.Model):
     # Docente al que corresponde este usuario (para "Mis horarios"). Puede estar vacío.
     docente = models.OneToOneField('Docente', models.DO_NOTHING, blank=True, null=True)
 
+    def __str__(self):
+        return self.nombre_usuario
+
     class Meta:
         managed = False
         db_table = 'usuario'
@@ -46,6 +49,9 @@ class FranjaHoraria(models.Model):
     dia_semana = models.SmallIntegerField(choices=DIAS_SEMANA)
     hora_inicio = models.TimeField()
     hora_fin = models.TimeField()
+
+    def __str__(self):
+        return f'{self.get_dia_semana_display()} {self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M}'
 
     class Meta:
         managed = False
@@ -59,6 +65,9 @@ class Aula(models.Model):
     capacidad = models.IntegerField()
     tipo = models.CharField(max_length=20, default='convencional', choices=TIPOS_AULA)
 
+    def __str__(self):
+        return self.codigo
+
     class Meta:
         managed = False
         db_table = 'aula'
@@ -70,6 +79,9 @@ class Asignatura(models.Model):
     nombre = models.CharField(max_length=120)
     intensidad_horaria = models.SmallIntegerField()
     tipo_aula_requerida = models.CharField(max_length=20, default='convencional', choices=TIPOS_AULA)
+
+    def __str__(self):
+        return f'{self.nombre} ({self.codigo})'
 
     class Meta:
         managed = False
@@ -83,6 +95,9 @@ class Docente(models.Model):
     correo = models.CharField(max_length=120, blank=True, null=True)
     activo = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.nombre
+
     class Meta:
         managed = False
         db_table = 'docente'
@@ -93,6 +108,9 @@ class Grupo(models.Model):
     programa = models.CharField(max_length=100, blank=True, null=True)
     semestre = models.SmallIntegerField(blank=True, null=True)
     cantidad_estudiantes = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.codigo} {self.programa or ""}'.strip()
 
     class Meta:
         managed = False

@@ -44,7 +44,8 @@ GRUPOS = [   # (código, programa, semestre, estudiantes)
     ('G-101', 'Ingeniería', 1, 30),
     ('G-102', 'Ingeniería', 1, 28),
     ('G-201', 'Ingeniería', 3, 25),
-    ('G-301', 'Psicología', 1, 40),
+    ('G-301', 'Psicología', 1, 30),     # eran 40: máximo 30 por grupo,
+    ('G-301-B', 'Psicología', 1, 10),   # así que los 10 que sobran forman otro grupo
 ]
 
 # Qué materias dicta cada docente: exactamente 2 por profe (cédula -> códigos de asignatura)
@@ -70,11 +71,11 @@ CLASES = [
     # G-201 Ingeniería, semestre 3 (25 estudiantes)
     ('G-201', 'MAT2', '1000000001'), ('G-201', 'EST1', '1000000002'), ('G-201', 'PRW1', '1000000003'),
     ('G-201', 'HIS1', '1000000004'), ('G-201', 'QUI1', '1000000005'), ('G-201', 'COM1', '1000000006'),
-    # G-301 Psicología, semestre 1 (40 estudiantes)
+    # G-301 Psicología, semestre 1 (30 estudiantes) y G-301-B (10 estudiantes, mismas clases)
     ('G-301', 'PSI1', '1000000004'), ('G-301', 'HIS1', '1000000004'), ('G-301', 'BIO1', '1000000005'),
-    ('G-301', 'ING1', '1000000006'),
-    # Química para 40 estudiantes: ningún laboratorio tiene cupo -> conflicto de ejemplo
-    ('G-301', 'QUI1', '1000000005'),
+    ('G-301', 'ING1', '1000000006'), ('G-301', 'QUI1', '1000000005'),
+    ('G-301-B', 'PSI1', '1000000004'), ('G-301-B', 'HIS1', '1000000004'), ('G-301-B', 'BIO1', '1000000005'),
+    ('G-301-B', 'ING1', '1000000006'), ('G-301-B', 'QUI1', '1000000005'),
 ]
 
 

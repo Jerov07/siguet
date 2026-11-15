@@ -1,13 +1,15 @@
+from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import DatabaseError, IntegrityError, transaction
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from cuentas.decoradores import requiere_perfil
 from nucleo.models import Asignacion, Conflicto, Ejecucion, RestriccionBlanda, Usuario, DIAS_SEMANA
 
-from . import algoritmo, datos, guardado
+from . import algoritmo, completar, datos, guardado
 from . import reglas_duras as duras
 
 # Orden en que se muestran los interruptores (el mismo del mockup)
@@ -158,3 +160,33 @@ def mover_asignacion(request, id):
         return JsonResponse({'ok': False, 'mensaje': 'Ese espacio ya está ocupado. Escoja otra opción.'}, status=409)
 
     return JsonResponse({'ok': True, 'mensaje': 'Clase movida correctamente.'})
+
+
+# ================= Asignar salón solo a lo que falta =================
+
+@require_POST
+@requiere_perfil('administrador')
+def asignar_pendientes(request):
+    try:
+        resultado = completar.asignar_pendientes()
+    except DatabaseError:
+        resultado = False
+        messages.error(request, 'No se pudo guardar. Intente de nuevo.')
+
+    if resultado is None:
+        messages.warning(request, 'Todavía no hay horario. Use primero «Generar Horario».')
+    elif resultado:
+        if resultado['pendientes'] == 0:
+            messages.info(request, 'Todas las clases ya tienen salón y hora.')
+        else:
+            if resultado['ubicadas']:
+                messages.success(request, f'Se asignó salón y hora a {resultado["ubicadas"]} clase(s) sin tocar el '
+                                          f'resto del horario.')
+            if resultado['sin_ubicar']:
+                messages.warning(request, f'{resultado["sin_ubicar"]} clase(s) no cupieron en los espacios libres. '
+                                          f'Mírelas en Reportes, en «Materias no programadas y conflictos».')
+
+    volver = request.POST.get('volver', '/')
+    if not url_has_allowed_host_and_scheme(volver, allowed_hosts={request.get_host()}):
+        volver = '/'
+    return redirect(volver)

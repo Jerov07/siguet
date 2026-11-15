@@ -653,3 +653,14 @@ body {
 .modo-edicion .clase-tarjeta:hover {
   transform: scale(1.04);
 }
+
+/* ===== Avisos que llevan al conflicto: solo se resaltan al pasar el mouse ===== */
+.tarjeta-enlace, .tarjeta-enlace:hover, .tarjeta-enlace *,
+.actividad-enlace, .actividad-enlace:hover, .actividad-enlace * { text-decoration: none !important; }
+.tarjeta-enlace { display: flex; color: inherit; transition: background-color .15s; }
+.tarjeta-enlace .numero { color: #1f2937; }
+.tarjeta-enlace .etiqueta { color: #374151; }
+.tarjeta-enlace:hover { background-color: #fff7ee; color: inherit; }
+.actividad-enlace { text-decoration: none; color: inherit; transition: background-color .15s; }
+.actividad-enlace:hover { background-color: #f1f5fb; color: inherit; }
+#conflictos, [id^="conflicto-"] { scroll-margin-top: 90px; }

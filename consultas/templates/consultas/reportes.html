@@ -18,23 +18,35 @@
 {% endif %}
 
 <!-- Conflictos y materias no programadas -->
-<div class="tarjeta mb-3">
-  <div class="tarjeta-titulo"><i class="bi bi-exclamation-triangle"></i> Materias no programadas y conflictos</div>
+<div class="tarjeta mb-3" id="conflictos">
+  <div class="tarjeta-titulo justify-content-between">
+    <span><i class="bi bi-exclamation-triangle"></i> Materias no programadas y conflictos</span>
+    {% if hay_pendientes %}
+    <form method="post" action="{% url 'asignar_pendientes' %}" class="d-inline">{% csrf_token %}
+      <input type="hidden" name="volver" value="{{ request.path }}#conflictos">
+      <button class="btn btn-sm btn-siguet-borde"><i class="bi bi-door-open"></i> Asignar salón a los grupos sin horario</button>
+    </form>
+    {% endif %}
+  </div>
   <div class="table-responsive">
     <table class="table tabla-siguet mb-0">
       <thead>
-        <tr><th>Asignatura</th><th>Grupo</th><th>Docente</th><th>Restricción que lo impidió</th></tr>
+        <tr><th>Asignatura</th><th>Grupo</th><th>Docente</th><th>Restricción que lo impidió</th><th class="text-end">Solucionar</th></tr>
       </thead>
       <tbody>
         {% for c in conflictos %}
-        <tr>
+        <tr id="conflicto-{{ c.id }}">
           <td>{{ c.clase.asignatura.nombre }}</td>
           <td>{{ c.clase.grupo.codigo }}</td>
           <td>{{ c.clase.docente.nombre }}</td>
           <td><span class="badge text-bg-warning">{{ c.restriccion }}</span>{% if c.descripcion %}<div class="small text-secondary mt-1">{{ c.descripcion }}</div>{% endif %}</td>
+          <td class="text-end text-nowrap">
+            <a href="/catalogo/clases/{{ c.clase_id }}/editar/" class="btn btn-sm btn-outline-secondary" title="Editar la clase"><i class="bi bi-pencil"></i> Clase</a>
+            <a href="/catalogo/grupos/{{ c.clase.grupo_id }}/editar/" class="btn btn-sm btn-outline-secondary" title="Editar el grupo"><i class="bi bi-people"></i> Grupo</a>
+          </td>
         </tr>
         {% empty %}
-        <tr><td colspan="4" class="text-center text-secondary py-4">No hay conflictos registrados.</td></tr>
+        <tr><td colspan="5" class="text-center text-secondary py-4">No hay conflictos registrados.</td></tr>
         {% endfor %}
       </tbody>
     </table>

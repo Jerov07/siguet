@@ -1,3 +1,5 @@
+from generacion.completar import hay_pendientes
+from django.urls import reverse
 from django.db.models import Count
 from django.shortcuts import redirect, render
 
@@ -47,13 +49,15 @@ def dashboard(request):
     if ultima:
         actividad.append({'icono': 'bi-calendar3', 'texto': f'Horario generado ({ultima.get_estado_display().lower()})',
                           'detalle': f'por {ultima.usuario.nombre_completo}' if ultima.usuario else '',
-                          'fecha': ultima.fecha})
+                          'fecha': ultima.fecha, 'url': '/consultas/horario/'})
         for c in Conflicto.objects.select_related('clase__asignatura', 'clase__grupo')[:2]:
             actividad.append({'icono': 'bi-exclamation-triangle', 'texto': f'Conflicto: {c.clase.asignatura.nombre} ({c.clase.grupo.codigo})',
-                              'detalle': c.restriccion, 'fecha': ultima.fecha})
+                              'detalle': c.restriccion, 'fecha': ultima.fecha,
+                              'url': f'/consultas/reportes/#conflicto-{c.id}'})
     for u in Usuario.objects.order_by('-fecha_creacion')[:4]:
         actividad.append({'icono': 'bi-person-plus', 'texto': f'Nuevo usuario añadido: {u.nombre_completo}',
-                          'detalle': u.get_perfil_display(), 'fecha': u.fecha_creacion})
+                          'detalle': u.get_perfil_display(), 'fecha': u.fecha_creacion,
+                          'url': reverse('usuario_editar', args=[u.id])})
     actividad = sorted(actividad, key=lambda x: x['fecha'], reverse=True)[:4]
 
     return render(request, 'consultas/dashboard.html', {
@@ -130,6 +134,7 @@ def horario(request):
         'seleccionado': seleccionado,
         'dias': dias,
         'filas': filas,
+        'hay_clases': any(celda for fila in filas for celda in fila['celdas']),
     })
 
 
@@ -209,4 +214,5 @@ def reportes(request):
         'ultima_ejecucion': Ejecucion.objects.first(),
         'conflictos': conflictos,
         'ocupacion': ocupacion,
+        'hay_pendientes': hay_pendientes(),
     })

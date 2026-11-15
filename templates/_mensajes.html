@@ -1,0 +1,7 @@
+{# Mensajes de éxito o error que dejan las vistas con messages.success / messages.error #}
+{% for mensaje in messages %}
+  <div class="alert {% if mensaje.tags == 'success' %}alert-success{% elif mensaje.tags == 'warning' %}alert-warning{% elif mensaje.tags == 'info' %}alert-info{% else %}alert-danger{% endif %} alert-dismissible fade show py-2">
+    {{ mensaje }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+{% endfor %}
