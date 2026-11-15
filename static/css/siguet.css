@@ -321,14 +321,36 @@ body {
 /* ---------- Login ---------- */
 .fondo-login {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e6e9ee 0%, #cfd4dc 100%);
+  /* Fondo en dos tonos con corte diagonal, como en el mockup */
+  background: linear-gradient(110deg, #e9ebef 0%, #e1e4e9 52%, #ccd1d8 52%, #d6dae0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 32px;
+}
+
+/* Contenedor tipo pantalla/tablet con marco oscuro (mockup) */
+.marco-login {
+  width: min(1080px, 100%);
+  background-color: #121418;
+  border-radius: 24px;
+  padding: 4px 9px 12px;            /* marco más grueso abajo y a los lados */
+  box-shadow: 0 30px 60px rgba(16, 24, 40, 0.28), 0 8px 18px rgba(16, 24, 40, 0.18);
+}
+
+.pantalla-login {
+  min-height: 560px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e3e6ea 0%, #d5d9df 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
 }
 
 .tarjeta-login {
   width: 380px;
+  max-width: 100%;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(16, 24, 40, 0.15);
@@ -354,11 +376,7 @@ body {
 }
 
 /* ---------- Celular y tableta (RNF-15) ---------- */
-@media (max-width: 768px) {
-  .layout { flex-direction: column; }
-  .menu-lateral { width: 100%; }
-  .menu-abajo { margin-top: 8px; }
-}
+/* (lo del celular está al final del archivo, en «Pantallas pequeñas») */
 
 /* ---------- Horario semanal ---------- */
 .vistas a {
@@ -637,11 +655,6 @@ body {
   .nav-horario { margin-left: 0; flex-wrap: wrap; gap: 16px; }
 }
 
-@media (max-width: 768px) {
-  .layout-generar { flex-direction: column; }
-  .menu-degradado { width: 100%; }
-}
-
 /* ---------- Modo de edición manual del horario ---------- */
 .modo-edicion .clase-tarjeta {
   cursor: pointer;
@@ -664,3 +677,66 @@ body {
 .actividad-enlace { text-decoration: none; color: inherit; transition: background-color .15s; }
 .actividad-enlace:hover { background-color: #f1f5fb; color: inherit; }
 #conflictos, [id^="conflicto-"] { scroll-margin-top: 90px; }
+
+/* =========================================================
+   Pantallas pequeñas (celular): menú escondido detrás del botón ☰
+   En computador y tablet todo se ve igual que en el mockup.
+   ========================================================= */
+.btn-menu, .marca-movil, .aviso-deslizar { display: none; }
+
+@media (max-width: 767.98px) {
+  .btn-menu { display: inline-flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+  .btn-menu-oscuro { background: none; border: 0; color: #ffffff; width: 40px; height: 40px; padding: 0; }
+
+  /* --- Estilo Dashboard (menú azul marino) --- */
+  .layout { flex-direction: column; }
+  .menu-lateral { display: none; width: 100%; padding: 8px 14px 14px; }
+  .menu-lateral .marca { display: none; }
+  .menu-abierto .menu-lateral { display: flex; }
+  .menu-abajo { margin-top: 8px; }
+  /* Orden en celular: barra (con ☰) → menú (si está abierto) → contenido */
+  .contenido { display: contents; }
+  .barra-superior { order: 0; }
+  .menu-lateral { order: 1; }
+  .area-principal { order: 2; }
+  .barra-superior { height: 58px; padding: 0 12px; gap: 10px; justify-content: flex-start;
+                    background-color: var(--azul-marino); border-bottom: 0; }
+  .barra-superior .btn-menu { background: none; border: 0; color: #ffffff; }
+  .marca-movil { display: flex; align-items: center; gap: 8px; margin-right: auto; color: #ffffff;
+                 font-size: 1.3rem; font-weight: 700; text-decoration: none; }
+  .barra-superior .btn-icono { background-color: transparent; border-color: rgba(255,255,255,.25); color: #ffffff; }
+  .barra-superior .usuario-nombre { display: none; }
+  .barra-superior .avatar { width: 32px; height: 32px; }
+  .area-principal { padding: 14px; }
+
+  /* --- Estilo Generar (menú con degradado) --- */
+  .barra-oscura { padding: 0 12px; gap: 8px; }
+  .marca-oscura { margin-right: auto; }
+  .layout-generar { flex-direction: column; }
+  .menu-degradado { display: none; width: 100%; }
+  .menu-abierto .menu-degradado { display: block; }
+  .area-generar { padding: 14px; }
+
+  /* --- Estilo Vista semanal (barra horizontal) --- */
+  .barra-horario { margin: 10px 10px 0; padding: 10px 14px; gap: 10px; flex-wrap: wrap; }
+  .marca-horario { margin-right: auto; }
+  .marca-horario .nombre { font-size: 1.4rem; }
+  .marca-horario .lema { display: none; }
+  .usuario-horario, .nav-horario { display: none; width: 100%; }
+  .menu-abierto .usuario-horario { display: flex; margin: 4px 0 0; }
+  .menu-abierto .nav-horario { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 6px 0 4px; }
+  .area-horario { padding: 12px 10px 20px; }
+  .filtros-horario .form-select { width: 100%; min-width: 0; }
+  .filtros-horario > div { width: 100%; }
+
+  /* --- Login --- */
+  .fondo-login { padding: 14px; }
+  .marco-login { border-radius: 18px; padding: 3px 5px 8px; }
+  .pantalla-login { min-height: calc(100vh - 40px); border-radius: 14px; padding: 24px 12px; }
+  .tarjeta-login { padding: 28px 22px; }
+
+  /* --- General --- */
+  .aviso-deslizar { display: block; font-size: .8rem; color: var(--texto-suave); margin-bottom: 6px; }
+  .tarjeta-titulo { flex-wrap: wrap; gap: 8px; }
+  h1, .h1 { font-size: 1.5rem; }
+}
